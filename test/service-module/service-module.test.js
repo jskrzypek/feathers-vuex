@@ -26,6 +26,7 @@ describe('Service Module', () => {
         auto: true,
         autoRemove: false,
         nameStyle: 'short',
+        respectExisting: false,
         auth: {
           namespace: 'auth',
           userService: '',

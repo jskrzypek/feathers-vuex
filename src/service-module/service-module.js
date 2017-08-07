@@ -1,4 +1,4 @@
-import { getShortName, getNameFromPath, getNameFromExplicit, getModuleFromStore } from '../utils'
+import { getShortName, getNameFromPath, getNameFromExplicit, storeHasServiceModule, deleteExistingWrappedGetters, mergeExisting } from '../utils'
 import _merge from 'lodash.merge'
 import makeState from './state'
 import makeGetters from './getters'
@@ -16,9 +16,9 @@ export default function setupServiceModule (store) {
     let namespace = nameStyles[vuexOptions.global.nameStyle](service)
     const oldName = vuexOptions.module.oldName
 
-    // When .vuex() is manually called, tear down the previous module.
+    // When .vuex() is manually called, tear down the previous module if it's a set up service module
     // Tear down before the module name is updated to remove the correct one.
-    if (getModuleFromStore(store, oldName)) {
+    if (oldName && storeHasServiceModule(store, oldName)) {
       store.unregisterModule(oldName)
     }
 
@@ -26,15 +26,24 @@ export default function setupServiceModule (store) {
     _merge(service.vuexOptions, { module: { namespace } })
     vuexOptions.modules[service.path] = vuexOptions.module
 
-    // Setup or re-setup the module if .vuex() was called manually.
-    if (!getModuleFromStore(store, namespace) || force) {
-      store.registerModule(namespace, {
+    // Setup if module is not present/not set up, or re-setup the module if .vuex() was called manually.
+    if (!storeHasServiceModule(store, namespace) || force) {
+      const rawModule = {
         namespaced: true,
         state: makeState(service),
         getters: makeGetters(service),
         mutations: makeMutations(service),
         actions: makeActions(service)
-      })
+      }
+
+      // If the module exists in the store, it is not a service module, optionally respect its setup
+      if (vuexOptions.respectExisting) {
+        mergeExisting(rawModule, store, namespace, { namespaced: true })
+      }
+
+      // clean up stray getters when we register over an existing module
+      deleteExistingWrappedGetters(store, namespace)
+      store.registerModule(namespace, rawModule)
     }
   }
 }

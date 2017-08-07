@@ -23,6 +23,7 @@ export default service => {
     errorOnUpdate: undefined,
     errorOnPatch: undefined,
     errorOnRemove: undefined,
+
     ...customState
   }
   return state

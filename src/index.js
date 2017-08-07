@@ -10,6 +10,7 @@ const defaultOptions = {
   auto: true, // automatically setup a store for each service.
   autoRemove: false, // automatically remove records missing from responses (only use with feathers-rest)
   nameStyle: 'short', // Determines the source of the module name. 'short', 'path', or 'explicit'
+  respectExisting: false, // if a module exists in the store already for a namespace of a service, respect that module's state, getters, mutations, and actions
   auth: {
     namespace: 'auth',
     userService: '', // Set this to automatically populate the user on login success.
