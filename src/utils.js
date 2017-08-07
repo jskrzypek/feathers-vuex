@@ -44,7 +44,8 @@ export function getNameFromPath (service) {
   }
 
   // Otherwise return the full service path.
-  return service.path
+  namespace = service.path
+  return namespace
 }
 
 export function getNameFromExplicit (service) {
@@ -76,6 +77,22 @@ export function makeConfig (options, modules) {
     }
     return service
   }
+}
+
+export function castArray (value) {
+  return Array.isArray(value) ? value : [value]
+}
+
+export function getModuleFromStore (store, namespace) {
+  try {
+    return store._modules.get(castArray(namespace))
+  } catch (e) { }
+}
+
+export function getNamespaceFromStore (store, namespace) {
+  try {
+    return store._modules.getNamespace(castArray(namespace))
+  } catch (e) { }
 }
 
 // from https://github.com/iliakan/detect-node

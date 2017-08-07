@@ -1,4 +1,4 @@
-import { getShortName, getNameFromPath, getNameFromExplicit } from '../utils'
+import { getShortName, getNameFromPath, getNameFromExplicit, getModuleFromStore } from '../utils'
 import _merge from 'lodash.merge'
 import makeState from './state'
 import makeGetters from './getters'
@@ -14,20 +14,20 @@ export default function setupServiceModule (store) {
       explicit: getNameFromExplicit
     }
     let namespace = nameStyles[vuexOptions.global.nameStyle](service)
-    const existingName = service.vuexOptions.module.oldName
+    const oldName = vuexOptions.module.oldName
 
     // When .vuex() is manually called, tear down the previous module.
     // Tear down before the module name is updated to remove the correct one.
-    if (store.state[existingName]) {
-      store.unregisterModule(existingName)
+    if (getModuleFromStore(store, oldName)) {
+      store.unregisterModule(oldName)
     }
 
     // update the name
-    _merge(service.vuexOptions, { module: {namespace} })
+    _merge(service.vuexOptions, { module: { namespace } })
     vuexOptions.modules[service.path] = vuexOptions.module
 
     // Setup or re-setup the module if .vuex() was called manually.
-    if (!store.state[namespace] || force) {
+    if (!getModuleFromStore(store, namespace) || force) {
       store.registerModule(namespace, {
         namespaced: true,
         state: makeState(service),
