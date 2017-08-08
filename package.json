@@ -26,6 +26,7 @@
     "node": ">= 4.6.0"
   },
   "scripts": {
+    "prepare": "npm run compile",
     "prepublish": "npm run compile",
     "publish": "git push origin --tags && npm run changelog && git push origin",
     "release:patch": "npm version patch && npm publish",
